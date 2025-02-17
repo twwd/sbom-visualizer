@@ -3,6 +3,8 @@
 A small web application that processes a [CycloneDX](https://cyclonedx.org/) SBOM in the browser
 and displays the contained components and their dependency tree.
 
+> ⚠️ It is in PoC state without much error handling. _There will be bugs. 🪲🪲🪲_
+
 
 ## Developing
 

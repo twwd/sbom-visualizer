@@ -23,6 +23,8 @@
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@testing-library/svelte": "^5.2.4",
+		"@types/node": "^22.13.4",
+		"carbon-preprocess-svelte": "^0.11.10",
 		"eslint": "^9.18.0",
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-svelte": "^2.46.1",
@@ -30,6 +32,7 @@
 		"jsdom": "^25.0.1",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.3",
+		"sass-embedded": "^1.85.0",
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
 		"typescript": "^5.0.0",
@@ -42,5 +45,14 @@
 			"esbuild"
 		]
 	},
-	"packageManager": "pnpm@9.12.1+sha512.e5a7e52a4183a02d5931057f7a0dbff9d5e9ce3161e33fa68ae392125b79282a8a8a470a51dfc8a0ed86221442eb2fb57019b0990ed24fab519bf0e1bc5ccfc4"
+	"packageManager": "pnpm@9.12.1+sha512.e5a7e52a4183a02d5931057f7a0dbff9d5e9ce3161e33fa68ae392125b79282a8a8a470a51dfc8a0ed86221442eb2fb57019b0990ed24fab519bf0e1bc5ccfc4",
+	"dependencies": {
+		"@carbon/charts-svelte": "^1.22.17",
+		"@carbon/layout": "^11.29.0",
+		"@carbon/type": "^11.35.0",
+		"@cyclonedx/cyclonedx-library": "^7.1.0",
+		"@ibm/plex": "^6.4.1",
+		"carbon-components-svelte": "^0.87.5",
+		"carbon-icons-svelte": "^13.2.0"
+	}
 }

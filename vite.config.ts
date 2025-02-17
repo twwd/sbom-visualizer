@@ -1,9 +1,23 @@
 import { svelteTesting } from '@testing-library/svelte/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
+import { optimizeCss } from 'carbon-preprocess-svelte';
 
 export default defineConfig({
-	plugins: [sveltekit()],
+	plugins: [sveltekit(), optimizeCss()],
+
+	ssr: {
+		noExternal: process.env.NODE_ENV === 'production' ? ['@carbon/charts'] : []
+	},
+
+	css: {
+		preprocessorOptions: {
+			scss: {
+				api: 'modern-compiler',
+				silenceDeprecations: ['global-builtin']
+			}
+		}
+	},
 
 	test: {
 		workspace: [
