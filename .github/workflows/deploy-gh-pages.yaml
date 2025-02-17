@@ -9,10 +9,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: node:lts-alpine
+      image: node:lts-slim
     env:
       IBM_TELEMETRY_DISABLED: true
     steps:
+      - name: Enable Corepack for pnpm
+        run: corepack enable
+
       - name: Checkout
         uses: actions/checkout@v4
 
