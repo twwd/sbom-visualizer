@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: node:lts-alpine
-    environment:
+    env:
       IBM_TELEMETRY_DISABLED: true
     steps:
       - name: Checkout
