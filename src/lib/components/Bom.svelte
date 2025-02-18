@@ -6,7 +6,8 @@
 	import ComponentsTreeChart from '$lib/components/ComponentsTreeChart.svelte';
 	import ComponentModal from '$lib/components/ComponentModal.svelte';
 	import { Document } from 'carbon-icons-svelte';
-	import { createTreeDataFromBom, type TreeItem } from '$lib/tree';
+	import { createTreeDataFromBom } from '$lib/tree';
+	import type { TreeItem } from '$lib/models/tree';
 
 	let { bom = null }: { bom: Bom | null } = $props();
 

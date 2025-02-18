@@ -1,59 +1,5 @@
 import type { Bom } from '$lib/cyclonedx/models';
-import type { TreeNode } from 'carbon-components-svelte/src/TreeView/TreeView.svelte';
-
-// Used for the tree chart
-export interface TreeChartItem {
-	name: string;
-	value?: string;
-	children?: TreeChartItem[];
-}
-
-// The combined type that can be used for the TreeView and the TreeChart
-export type TreeItem = TreeChartItem & TreeNode;
-
-class TreeItemImpl implements TreeItem {
-	private readonly _name: string;
-	private readonly _ref: string;
-	private readonly _children: TreeItem[] | undefined;
-
-	constructor(name: string, ref: string, children?: TreeItem[]) {
-		this._name = name;
-		this._ref = ref;
-		this._children = children && children.length > 0 ? children : undefined;
-	}
-
-	get name() {
-		return this._name;
-	}
-
-	get text() {
-		return this._name;
-	}
-
-	get id() {
-		return this._ref;
-	}
-
-	get value() {
-		return this._ref;
-	}
-
-	get children() {
-		return this._children;
-	}
-
-	get nodes() {
-		return this._children;
-	}
-
-	get icon() {
-		return undefined;
-	}
-
-	get disabled() {
-		return undefined;
-	}
-}
+import { type TreeItem, TreeItemImpl } from '$lib/models/tree';
 
 export function createTreeDataFromBom(bom: Bom): TreeItem[] {
 	const componentRefToName = new Map<string, string>();
@@ -73,27 +19,33 @@ export function createTreeDataFromBom(bom: Bom): TreeItem[] {
 
 	const subject = bom.metadata?.component;
 
-	function getChildTreeItems(componentRef: string) {
+	function getChildTreeItems(componentRef: string, visited: Set<string>): TreeItem[] {
+		// If we've already visited this component, return an empty array to prevent cycles
+		if (visited.has(componentRef)) {
+			console.warn(`Cycle detected for ${componentRef}`);
+			return [];
+		}
+
+		// Mark the current component as visited
+		visited.add(componentRef);
+
 		return (dependencyMap.get(componentRef) ?? [])
 			.map((child) => {
 				if (componentRefToName.has(child)) {
-					return getTreeItem(child, componentRefToName.get(child)!);
+					return new TreeItemImpl(
+						componentRefToName.get(child)!,
+						child,
+						getChildTreeItems(child, new Set(visited))
+					);
 				} else {
 					return null;
 				}
 			})
-			.filter((child) => child !== null);
+			.filter((child) => child !== null) as TreeItem[];
 	}
 
-	const getTreeItem: (componentRef: string, componentName: string) => TreeItem = (
-		componentRef,
-		componentName
-	) => {
-		return new TreeItemImpl(componentName, componentRef, getChildTreeItems(componentRef));
-	};
-
 	if (subject && subject['bom-ref']) {
-		data.push(...getChildTreeItems(subject['bom-ref']));
+		data.push(...getChildTreeItems(subject['bom-ref'], new Set<string>()));
 	} else {
 		console.error(`No subject found in ${bom.metadata}`);
 	}

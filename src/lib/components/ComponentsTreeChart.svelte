@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { TreeChart, type TreeChartOptions } from '@carbon/charts-svelte';
 	import '@carbon/charts-svelte/styles.css';
-	import type { TreeChartItem } from '$lib/tree';
 	import type { Bom } from '$lib/cyclonedx/models';
+	import type { TreeChartItem } from '$lib/models/tree';
 
 	let { bom, nodes = [] }: { bom: Bom; nodes: TreeChartItem[] } = $props();
 
