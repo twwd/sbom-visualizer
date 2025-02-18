@@ -1,16 +1,11 @@
 <script lang="ts">
-	import type { Bom } from '$lib/cyclonedx/models';
 	import '@carbon/charts-svelte/styles.css';
 	import { Button, ButtonSet, TreeView } from 'carbon-components-svelte';
-	import { createTreeNodesFromBom } from '$lib/treeview';
 	import type { TreeNode } from 'carbon-components-svelte/src/TreeView/TreeView.svelte';
 	import { CollapseAll, ExpandAll } from 'carbon-icons-svelte';
 
-	let { bom, selectedComponentRef }: { bom: Bom; selectedComponentRef?: string } = $props();
-
-	let nodes: TreeNode[] = $derived.by(() => {
-		return createTreeNodesFromBom(bom);
-	});
+	let { nodes, selectedComponentRef }: { nodes: TreeNode[]; selectedComponentRef?: string } =
+		$props();
 
 	let treeview: TreeView | null = null;
 

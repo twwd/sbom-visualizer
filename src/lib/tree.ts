@@ -1,21 +1,69 @@
-import type { ChartTabularData } from '@carbon/charts-svelte';
-import type { Bom, Component } from '$lib/cyclonedx/models';
+import type { Bom } from '$lib/cyclonedx/models';
+import type { TreeNode } from 'carbon-components-svelte/src/TreeView/TreeView.svelte';
 
-interface TreeItem {
+// Used for the tree chart
+export interface TreeChartItem {
 	name: string;
 	value?: string;
-	children?: TreeItem[];
+	children?: TreeChartItem[];
 }
 
-export function createTreeFromBom(bom: Bom): ChartTabularData {
-	const componentMap = new Map<string, Component>();
+// The combined type that can be used for the TreeView and the TreeChart
+export type TreeItem = TreeChartItem & TreeNode;
+
+class TreeItemImpl implements TreeItem {
+	private readonly _name: string;
+	private readonly _ref: string;
+	private readonly _children: TreeItem[] | undefined;
+
+	constructor(name: string, ref: string, children?: TreeItem[]) {
+		this._name = name;
+		this._ref = ref;
+		this._children = children && children.length > 0 ? children : undefined;
+	}
+
+	get name() {
+		return this._name;
+	}
+
+	get text() {
+		return this._name;
+	}
+
+	get id() {
+		return this._ref;
+	}
+
+	get value() {
+		return this._ref;
+	}
+
+	get children() {
+		return this._children;
+	}
+
+	get nodes() {
+		return this._children;
+	}
+
+	get icon() {
+		return undefined;
+	}
+
+	get disabled() {
+		return undefined;
+	}
+}
+
+export function createTreeDataFromBom(bom: Bom): TreeItem[] {
+	const componentRefToName = new Map<string, string>();
 	const dependencyMap = new Map<string, string[]>();
 
-	const data: ChartTabularData = [];
+	const data: TreeItem[] = [];
 
 	for (const component of bom.components ?? []) {
 		if (component['bom-ref']) {
-			componentMap.set(component['bom-ref'], component);
+			componentRefToName.set(component['bom-ref'], component.name);
 		}
 	}
 
@@ -25,12 +73,11 @@ export function createTreeFromBom(bom: Bom): ChartTabularData {
 
 	const subject = bom.metadata?.component;
 
-	function getChildren(component: Component) {
-		return (component['bom-ref'] ? (dependencyMap.get(component['bom-ref']) ?? []) : [])
+	function getChildTreeItems(componentRef: string) {
+		return (dependencyMap.get(componentRef) ?? [])
 			.map((child) => {
-				const childComponent = componentMap.get(child);
-				if (childComponent) {
-					return getTreeItem(childComponent);
+				if (componentRefToName.has(child)) {
+					return getTreeItem(child, componentRefToName.get(child)!);
 				} else {
 					return null;
 				}
@@ -38,16 +85,15 @@ export function createTreeFromBom(bom: Bom): ChartTabularData {
 			.filter((child) => child !== null);
 	}
 
-	const getTreeItem: (component: Component) => TreeItem = (component: Component) => {
-		return {
-			name: component.name,
-			value: component['bom-ref'] ?? null,
-			children: getChildren(component)
-		} as TreeItem;
+	const getTreeItem: (componentRef: string, componentName: string) => TreeItem = (
+		componentRef,
+		componentName
+	) => {
+		return new TreeItemImpl(componentName, componentRef, getChildTreeItems(componentRef));
 	};
 
-	if (subject) {
-		data.push(...getChildren(subject));
+	if (subject && subject['bom-ref']) {
+		data.push(...getChildTreeItems(subject['bom-ref']));
 	} else {
 		console.error(`No subject found in ${bom.metadata}`);
 	}
