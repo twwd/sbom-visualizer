@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Bom } from '$lib/cyclonedx/models';
+	import type { Bom, Component } from '$lib/cyclonedx/models';
 	import ComponentsTable from '$lib/components/ComponentsTable.svelte';
 	import ComponentsTreeView from '$lib/components/ComponentsTreeView.svelte';
 	import { Button, Tab, TabContent, Tabs, Tile } from 'carbon-components-svelte';
@@ -11,12 +11,15 @@
 
 	let { bom = null }: { bom: Bom | null } = $props();
 
-	let subjectComponentModalOpened = $state(false);
-
+	let selectedComponentForModal: Component | undefined = $state();
 	let selectedComponentRefInTreeView: string | undefined = $state();
 
 	function searchComponentInTreeView(id: string) {
 		selectedComponentRefInTreeView = id;
+	}
+
+	function showComponentModal(component?: Component) {
+		selectedComponentForModal = component;
 	}
 
 	let treeData: TreeItem[] | undefined = $derived.by(() => {
@@ -28,9 +31,9 @@
 
 {#if bom}
 	{#if bom.metadata?.component}
-		<section class="tile">
+		<section class="subject-tile">
 			<Tile>
-				<div class="tile__content">
+				<div class="subject-tile__content">
 					<p>
 						SBOM for <strong>{bom.metadata.component.name}</strong>
 					</p>
@@ -39,38 +42,40 @@
 						icon={Document}
 						iconDescription="Show details"
 						kind="primary"
-						on:click={() => (subjectComponentModalOpened = true)}
+						on:click={() => showComponentModal(bom.metadata?.component)}
 					/>
 				</div>
 			</Tile>
 		</section>
-		<ComponentModal component={subjectComponentModalOpened ? bom.metadata.component : undefined} />
 	{/if}
 	{#if bom.components}
 		<section class="tabs">
-			<Tabs>
+			<Tabs type="default">
 				<Tab label="Table" />
 				<Tab label="Chart" />
 				<svelte:fragment slot="content">
 					<TabContent>
 						{#if treeData}
-							<div class="treeview">
+							<div class="tab__tile">
 								<ComponentsTreeView
 									nodes={treeData}
 									selectedComponentRef={selectedComponentRefInTreeView}
 								/>
 							</div>
 						{/if}
-						<div class="table">
+						<div class="tab__tile">
 							<ComponentsTable
 								components={bom.components}
 								searchComponent={searchComponentInTreeView}
+								showComponentDetails={showComponentModal}
 							/>
 						</div>
 					</TabContent>
 					<TabContent>
 						{#if treeData}
-							<ComponentsTreeChart {bom} nodes={treeData} />
+							<div class="tab__tile">
+								<ComponentsTreeChart {bom} nodes={treeData} />
+							</div>
 						{/if}
 					</TabContent>
 				</svelte:fragment>
@@ -79,20 +84,37 @@
 	{/if}
 {/if}
 
+<ComponentModal component={selectedComponentForModal} />
+
 <style lang="scss">
 	@use '@carbon/layout';
+	@use '@carbon/styles/scss/theme';
 
-	.tile__content {
-		display: flex;
-		align-items: center;
-		gap: layout.$spacing-03;
-	}
-
-	.tile {
+	.subject-tile {
 		margin-bottom: layout.$spacing-07;
+
+		&__content {
+			display: flex;
+			align-items: center;
+			gap: layout.$spacing-03;
+		}
 	}
 
-	.treeview {
+	:global .bx--tab-content {
+		background-color: theme.$layer-accent;
+		padding-left: layout.$spacing-07;
+		padding-right: layout.$spacing-07;
+		margin-left: -2rem;
+		margin-right: -2rem;
+		margin-bottom: -2rem;
+	}
+
+	.tab__tile {
+		background-color: theme.$layer-01;
+		padding: layout.$spacing-05;
+	}
+
+	.tab__tile:first-of-type {
 		margin-bottom: layout.$spacing-07;
 	}
 </style>

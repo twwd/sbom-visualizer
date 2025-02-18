@@ -10,12 +10,16 @@
 	import type { DataTableRow } from 'carbon-components-svelte/src/DataTable/DataTable.svelte';
 	import type { Component } from '$lib/cyclonedx/models';
 	import { Document, Search } from 'carbon-icons-svelte';
-	import ComponentModal from '$lib/components/ComponentModal.svelte';
 
 	let {
 		components,
-		searchComponent
-	}: { components: Component[]; searchComponent: (id: string) => void } = $props();
+		searchComponent,
+		showComponentDetails
+	}: {
+		components: Component[];
+		searchComponent: (id: string) => void;
+		showComponentDetails: (component: Component) => void;
+	} = $props();
 
 	let rows: DataTableRow[] = $derived.by(() => {
 		return components.map((component) => {
@@ -32,15 +36,13 @@
 	let pageSize = $state(25);
 	let page = $state(1);
 
-	let selectedComponent: Component | undefined = $state();
-
-	function showComponentDetails(row: DataTableRow) {
+	function showComponentDetailsForRow(row: DataTableRow) {
 		const componentRef: string = row.id;
 		const component = components.find(
 			(component: Component) => component['bom-ref'] === componentRef
 		);
 		if (component) {
-			selectedComponent = component;
+			showComponentDetails(component);
 		}
 	}
 </script>
@@ -79,15 +81,13 @@
 				icon={Document}
 				iconDescription="Show details"
 				kind="ghost"
-				on:click={() => showComponentDetails(row)}
+				on:click={() => showComponentDetailsForRow(row)}
 			/>
 		{:else}{cell.value}{/if}
 	</svelte:fragment>
 </DataTable>
 
 <Pagination bind:pageSize bind:page totalItems={rows.length} pageSizes={[25, 50, 100]} />
-
-<ComponentModal component={selectedComponent} />
 
 <style lang="scss">
 	@use '@carbon/layout';

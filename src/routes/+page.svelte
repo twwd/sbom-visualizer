@@ -1,5 +1,8 @@
 <script lang="ts">
-	import { FileUploaderDropContainer, FileUploaderItem } from 'carbon-components-svelte';
+	import {
+		FileUploaderButton,
+		FileUploaderItem,
+	} from 'carbon-components-svelte';
 	import Bom from '$lib/components/Bom.svelte';
 	import { parseJson } from '$lib/cyclonedx/parse';
 
@@ -12,19 +15,14 @@
 	}
 </script>
 
-<h1>SBOM Visualizer</h1>
-
 {#if file === null}
-	<p class="intro">Upload a CycloneDX BOM to get started!</p>
-	<FileUploaderDropContainer
-		labelText="Drag and drop a BOM here or click to upload"
-		validateFiles={(files: ReadonlyArray<File>) => {
-			return files.filter((file) => file.type === 'application/json');
-		}}
-		accept={['.json']}
-		on:change={handleFile}
-	/>
+	<section class="uploader">
+		<h1>SBOM Visualizer</h1>
+		<p class="intro">Upload a CycloneDX BOM to get started!</p>
+		<FileUploaderButton labelText="Upload SBOM" accept={['.json']} on:change={handleFile} />
+	</section>
 {:else}
+	<h1 class="heading--loaded">SBOM Visualizer</h1>
 	<FileUploaderItem name={file.name} status="edit" on:delete={() => (file = null)} />
 
 	{#await file.text() then fileContent}
@@ -40,8 +38,16 @@
 		margin-bottom: layout.$spacing-05;
 	}
 
+	.heading--loaded {
+		margin-left: layout.$spacing-04;
+	}
+
 	.intro {
-		@include type.type-style('productive-heading-04');
-		margin-bottom: layout.$spacing-05;
+		@include type.type-style('productive-heading-03');
+		margin-bottom: layout.$spacing-06;
+	}
+
+	.uploader {
+		margin: layout.$spacing-10;
 	}
 </style>

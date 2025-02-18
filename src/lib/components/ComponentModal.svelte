@@ -19,6 +19,6 @@
 <Modal bind:open={componentModelIsOpen} passiveModal modalHeading={componentModalContent.heading}>
 	{#if componentModalContent.component}
 		<ComponentInfo component={componentModalContent.component} />
-		<CodeSnippet type="multi" code={componentModalContent.code} />
+		<CodeSnippet type="multi" code={componentModalContent.code} expanded />
 	{/if}
 </Modal>

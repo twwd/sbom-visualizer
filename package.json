@@ -51,6 +51,7 @@
 	"dependencies": {
 		"@carbon/charts-svelte": "^1.22.17",
 		"@carbon/layout": "^11.29.0",
+		"@carbon/styles": "^1.75.0",
 		"@carbon/type": "^11.35.0",
 		"@cyclonedx/cyclonedx-library": "^7.1.0",
 		"@ibm/plex": "^6.4.1",
