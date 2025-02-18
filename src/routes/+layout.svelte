@@ -8,7 +8,7 @@
 		SkipToContent,
 		Theme
 	} from 'carbon-components-svelte';
-	import { SettingsAdjust } from 'carbon-icons-svelte';
+	import { LogoGithub, SettingsAdjust } from 'carbon-icons-svelte';
 	import 'carbon-components-svelte/css/all.css';
 	import type { CarbonTheme } from 'carbon-components-svelte/src/Theme/Theme.svelte';
 
@@ -29,9 +29,17 @@
 	<HeaderUtilities>
 		<HeaderGlobalAction
 			iconDescription="Settings"
-			tooltipAlignment="end"
+			tooltipAlignment="center"
 			icon={SettingsAdjust}
 			on:click={() => (settingsOpen = true)}
+		/>
+		<HeaderGlobalAction
+			iconDescription="GitHub"
+			tooltipAlignment="end"
+			icon={LogoGithub}
+			href="https://github.com/twwd/sbom-visualizer"
+			target="_blank"
+			rel="noopener"
 		/>
 	</HeaderUtilities>
 </Header>

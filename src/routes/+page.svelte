@@ -1,8 +1,5 @@
 <script lang="ts">
-	import {
-		FileUploaderButton,
-		FileUploaderItem,
-	} from 'carbon-components-svelte';
+	import { FileUploaderButton, FileUploaderItem } from 'carbon-components-svelte';
 	import Bom from '$lib/components/Bom.svelte';
 	import { parseJson } from '$lib/cyclonedx/parse';
 
