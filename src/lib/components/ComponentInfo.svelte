@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Component } from '$lib/cyclonedx/models';
-	import { Tile } from 'carbon-components-svelte';
+	import { CodeSnippet, Tile } from 'carbon-components-svelte';
 
 	const { component }: { component: Component } = $props();
 </script>
@@ -27,7 +27,13 @@
 			{#if component.purl}
 				<tr>
 					<th>PURL</th>
-					<td>{component.purl}</td>
+					<td><CodeSnippet type="inline" code={component.purl} /></td>
+				</tr>
+			{/if}
+			{#if component['bom-ref']}
+				<tr>
+					<th>BomRef</th>
+					<td><CodeSnippet type="inline" code={component['bom-ref']} /></td>
 				</tr>
 			{/if}
 		</tbody>

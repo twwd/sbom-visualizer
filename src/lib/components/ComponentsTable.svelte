@@ -28,7 +28,8 @@
 				name: component.name,
 				group: component.group,
 				version: component.version,
-				purl: component.purl
+				purl: component.purl,
+				bomRef: component['bom-ref']
 			};
 		});
 	});
