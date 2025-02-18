@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Bom } from '$lib/cyclonedx/models';
 	import ComponentsTable from '$lib/components/ComponentsTable.svelte';
-	import ComponentInfo from '$lib/components/ComponentInfo.svelte';
 	import ComponentsTreeView from '$lib/components/ComponentsTreeView.svelte';
 	import { Button, Tab, TabContent, Tabs, Tile } from 'carbon-components-svelte';
 	import ComponentsTree from '$lib/components/ComponentsTree.svelte';

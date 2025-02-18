@@ -1,8 +1,7 @@
-import type { Bom, Component } from '$lib/cyclonedx/models';
+import type { Bom } from '$lib/cyclonedx/models';
 import type { TreeNode } from 'carbon-components-svelte/src/TreeView/TreeView.svelte';
 
 export function createTreeNodesFromBom(bom: Bom): TreeNode[] {
-	// const componentMap = new Map<string, Component>();
 	const componentRefToName = new Map<string, string>();
 	const dependencyMap = new Map<string, string[]>();
 
@@ -10,7 +9,6 @@ export function createTreeNodesFromBom(bom: Bom): TreeNode[] {
 
 	for (const component of bom.components ?? []) {
 		if (component['bom-ref']) {
-			//componentMap.set(component['bom-ref'], component);
 			componentRefToName.set(component['bom-ref'], component.name);
 		}
 	}

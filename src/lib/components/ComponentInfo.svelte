@@ -5,12 +5,6 @@
 	const { component }: { component: Component } = $props();
 </script>
 
-<style lang="scss">
-	th {
-		font-weight: bold;
-	}
-</style>
-
 <Tile>
 	<table class="bx--data-table">
 		<tbody>
@@ -39,3 +33,9 @@
 		</tbody>
 	</table>
 </Tile>
+
+<style lang="scss">
+	th {
+		font-weight: bold;
+	}
+</style>

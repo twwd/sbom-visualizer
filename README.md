@@ -5,7 +5,6 @@ and displays the contained components and their dependency tree.
 
 > ⚠️ It is in PoC state without much error handling. _There will be bugs. 🪲🪲🪲_
 
-
 ## Developing
 
 Install the dependencies:
@@ -32,4 +31,3 @@ pnpm run build
 ```
 
 You can preview the production build with `npm run preview`.
-

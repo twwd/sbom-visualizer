@@ -6,7 +6,7 @@
 	import type { TreeNode } from 'carbon-components-svelte/src/TreeView/TreeView.svelte';
 	import { CollapseAll, ExpandAll } from 'carbon-icons-svelte';
 
-	let { bom, selectedComponentRef }: { bom: Bom, selectedComponentRef?: string } = $props();
+	let { bom, selectedComponentRef }: { bom: Bom; selectedComponentRef?: string } = $props();
 
 	let nodes: TreeNode[] = $derived.by(() => {
 		return createTreeNodesFromBom(bom);
