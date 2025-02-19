@@ -19,6 +19,8 @@ export function createTreeDataFromBom(bom: Bom): TreeItem[] {
 
 	const subject = bom.metadata?.component;
 
+	const childrenCache = new Map<string, TreeItem[] | undefined>();
+
 	function getChildTreeItems(componentRef: string, visited: Set<string>): TreeItem[] {
 		// If we've already visited this component, return an empty array to prevent cycles
 		if (visited.has(componentRef)) {
@@ -32,11 +34,14 @@ export function createTreeDataFromBom(bom: Bom): TreeItem[] {
 		return (dependencyMap.get(componentRef) ?? [])
 			.map((child) => {
 				if (componentRefToName.has(child)) {
-					return new TreeItemImpl(
-						componentRefToName.get(child)!,
-						child,
-						getChildTreeItems(child, new Set(visited))
-					);
+					let children;
+					if (childrenCache.has(child)) {
+						children = childrenCache.get(child);
+					} else {
+						children = getChildTreeItems(child, new Set(visited));
+						childrenCache.set(child, children);
+					}
+					return new TreeItemImpl(componentRefToName.get(child)!, child, children);
 				} else {
 					return null;
 				}
