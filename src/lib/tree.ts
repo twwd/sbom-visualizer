@@ -31,22 +31,22 @@ export function createTreeDataFromBom(bom: Bom): TreeItem[] {
 		// Mark the current component as visited
 		visited.add(componentRef);
 
-		return (dependencyMap.get(componentRef) ?? [])
-			.map((child) => {
-				if (componentRefToName.has(child)) {
-					let children;
-					if (childrenCache.has(child)) {
-						children = childrenCache.get(child);
-					} else {
-						children = getChildTreeItems(child, new Set(visited));
-						childrenCache.set(child, children);
-					}
-					return new TreeItemImpl(componentRefToName.get(child)!, child, children);
+		const parentChildren: TreeItemImpl[] = [];
+
+		for (const child of dependencyMap.get(componentRef) ?? []) {
+			if (componentRefToName.has(child)) {
+				let childChildren;
+				if (childrenCache.has(child)) {
+					childChildren = childrenCache.get(child);
 				} else {
-					return null;
+					childChildren = getChildTreeItems(child, new Set(visited));
+					childrenCache.set(child, childChildren);
 				}
-			})
-			.filter((child) => child !== null) as TreeItem[];
+				parentChildren.push(new TreeItemImpl(componentRefToName.get(child)!, child, childChildren));
+			}
+		}
+
+		return parentChildren;
 	}
 
 	if (subject && subject['bom-ref']) {
@@ -55,5 +55,6 @@ export function createTreeDataFromBom(bom: Bom): TreeItem[] {
 		console.error(`No subject found in ${bom.metadata}`);
 	}
 
+	console.log('Successfully created tree');
 	return data;
 }
