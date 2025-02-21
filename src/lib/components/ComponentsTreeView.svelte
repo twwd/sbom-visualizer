@@ -29,6 +29,12 @@
 	</ButtonSet>
 </div>
 
+<p>
+	<em
+		>Nodes with … at the end indicate that the maximum level of nesting is reached for this view.</em
+	>
+</p>
+
 <TreeView bind:this={treeview} {nodes} />
 
 <style lang="scss">
@@ -36,6 +42,10 @@
 
 	h2 {
 		margin-bottom: layout.$spacing-05;
+	}
+
+	p {
+		margin-bottom: layout.$spacing-02;
 	}
 
 	.buttons {

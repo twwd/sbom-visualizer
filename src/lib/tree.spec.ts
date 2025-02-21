@@ -104,7 +104,9 @@ describe('createTreeDataFromBom', () => {
 
 		const expected: TreeItem[] = [
 			new TreeItemImpl('a-name', 'a-ref', [
-				new TreeItemImpl('b-name', 'b-ref', [new TreeItemImpl('a-name', 'a-ref')])
+				new TreeItemImpl('b-name', 'b-ref', [
+					new TreeItemImpl('a-name', 'a-ref', [new TreeItemImpl('[cycle]', 'cycle')])
+				])
 			])
 		];
 

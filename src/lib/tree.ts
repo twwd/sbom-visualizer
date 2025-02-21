@@ -1,7 +1,9 @@
 import type { Bom } from '$lib/cyclonedx/models';
 import { type TreeItem, TreeItemImpl } from '$lib/models/tree';
 
-export function createTreeDataFromBom(bom: Bom): TreeItem[] {
+const PlaceholderTreeItemForCycle: TreeItem = new TreeItemImpl('[cycle]', 'cycle');
+
+export function createTreeDataFromBom(bom: Bom, maxDepth: number = 4): TreeItem[] {
 	const componentRefToName = new Map<string, string>();
 	const dependencyMap = new Map<string, string[]>();
 
@@ -21,28 +23,38 @@ export function createTreeDataFromBom(bom: Bom): TreeItem[] {
 
 	const childrenCache = new Map<string, TreeItem[] | undefined>();
 
-	function getChildTreeItems(componentRef: string, visited: Set<string>): TreeItem[] {
-		// If we've already visited this component, return an empty array to prevent cycles
-		if (visited.has(componentRef)) {
-			console.warn(`Cycle detected for ${componentRef}`);
-			return [];
-		}
+	let nodeCount = 1;
 
+	function getChildTreeItems(
+		componentRef: string,
+		visited: Set<string>,
+		maxDepth: number
+	): TreeItem[] {
 		// Mark the current component as visited
 		visited.add(componentRef);
 
-		const parentChildren: TreeItemImpl[] = [];
+		const parentChildren: TreeItem[] = [];
 
-		for (const child of dependencyMap.get(componentRef) ?? []) {
-			if (componentRefToName.has(child)) {
+		for (const childRef of dependencyMap.get(componentRef) ?? []) {
+			let childName = componentRefToName.get(childRef);
+			if (childName) {
 				let childChildren;
-				if (childrenCache.has(child)) {
-					childChildren = childrenCache.get(child);
+				if (maxDepth <= 0) {
+					console.warn('Maximum depth reached');
+					childName += '…';
+					childChildren = [];
+				} else if (visited.has(childRef)) {
+					// If we've already visited this component, return placeholder to prevent cycles
+					console.warn(`Cycle detected for ${componentRef}`);
+					childChildren = [PlaceholderTreeItemForCycle];
+				} else if (childrenCache.has(childRef)) {
+					childChildren = childrenCache.get(childRef);
 				} else {
-					childChildren = getChildTreeItems(child, new Set(visited));
-					childrenCache.set(child, childChildren);
+					childChildren = getChildTreeItems(childRef, new Set(visited), maxDepth - 1);
+					childrenCache.set(childRef, childChildren);
 				}
-				parentChildren.push(new TreeItemImpl(componentRefToName.get(child)!, child, childChildren));
+				nodeCount++;
+				parentChildren.push(new TreeItemImpl(childName, childRef, childChildren));
 			}
 		}
 
@@ -50,11 +62,13 @@ export function createTreeDataFromBom(bom: Bom): TreeItem[] {
 	}
 
 	if (subject && subject['bom-ref']) {
-		data.push(...getChildTreeItems(subject['bom-ref'], new Set<string>()));
+		data.push(...getChildTreeItems(subject['bom-ref'], new Set<string>(), maxDepth));
 	} else {
 		console.error(`No subject found in ${bom.metadata}`);
 	}
 
-	console.log('Successfully created tree');
+	console.log(
+		`Successfully created a tree with ${nodeCount} nodes`
+	);
 	return data;
 }
