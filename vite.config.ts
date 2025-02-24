@@ -7,7 +7,7 @@ export default defineConfig({
 	plugins: [sveltekit(), optimizeCss()],
 
 	ssr: {
-		noExternal: process.env.NODE_ENV === 'production' ? ['@carbon/charts'] : []
+		noExternal: process.env.NODE_ENV === 'production' ? ['sigma'] : []
 	},
 
 	css: {

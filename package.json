@@ -31,6 +31,7 @@
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-svelte": "^2.46.1",
 		"globals": "^15.14.0",
+		"graphology-types": "^0.24.8",
 		"jsdom": "^25.0.1",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.3",
@@ -49,13 +50,18 @@
 	},
 	"packageManager": "pnpm@9.12.1+sha512.e5a7e52a4183a02d5931057f7a0dbff9d5e9ce3161e33fa68ae392125b79282a8a8a470a51dfc8a0ed86221442eb2fb57019b0990ed24fab519bf0e1bc5ccfc4",
 	"dependencies": {
-		"@carbon/charts-svelte": "^1.22.17",
 		"@carbon/layout": "^11.29.0",
 		"@carbon/styles": "^1.75.0",
+		"@carbon/themes": "^11.46.0",
 		"@carbon/type": "^11.35.0",
 		"@cyclonedx/cyclonedx-library": "^7.1.0",
+		"@dagrejs/dagre": "^1.1.4",
 		"@ibm/plex": "^6.4.1",
 		"carbon-components-svelte": "^0.87.5",
-		"carbon-icons-svelte": "^13.2.0"
+		"carbon-icons-svelte": "^13.2.0",
+		"graphology": "^0.26.0",
+		"graphology-shortest-path": "^2.1.0",
+		"graphology-simple-path": "^0.2.0",
+		"sigma": "^3.0.1"
 	}
 }

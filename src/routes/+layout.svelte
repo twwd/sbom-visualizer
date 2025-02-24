@@ -11,11 +11,14 @@
 	import { LogoGithub, SettingsAdjust } from 'carbon-icons-svelte';
 	import 'carbon-components-svelte/css/all.css';
 	import type { CarbonTheme } from 'carbon-components-svelte/src/Theme/Theme.svelte';
+	import { setContext } from 'svelte';
 
 	let { children } = $props();
 
 	let settingsOpen = $state(false);
 	let theme: CarbonTheme = $state('g10');
+
+	setContext('theme', () => theme);
 </script>
 
 <svelte:head>

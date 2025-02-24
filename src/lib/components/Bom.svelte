@@ -6,25 +6,39 @@
 	import ComponentsTreeChart from '$lib/components/ComponentsTreeChart.svelte';
 	import ComponentModal from '$lib/components/ComponentModal.svelte';
 	import { Document } from 'carbon-icons-svelte';
-	import { createTreeDataFromBom } from '$lib/tree';
-	import type { TreeItem } from '$lib/models/tree';
 
 	let { bom = null }: { bom: Bom | null } = $props();
 
 	let selectedComponentForModal: Component | undefined = $state();
 	let selectedComponentRefInTreeView: string | undefined = $state();
+	let selectedComponentRefInTreeGraph: string | undefined = $state();
+	let searchValueInTable: string = $state('');
 
 	function searchComponentInTreeView(id: string) {
 		selectedComponentRefInTreeView = id;
+	}
+
+	function searchComponentInTreeGraph(id: string) {
+		selectedTabIndex = 1; // Switch to graph tab
+		selectedComponentRefInTreeGraph = id;
 	}
 
 	function showComponentModal(component?: Component) {
 		selectedComponentForModal = component;
 	}
 
-	let treeData: TreeItem[] | undefined = $derived.by(() => {
-		if (bom) {
-			return createTreeDataFromBom(bom);
+	function searchForComponentInTable(ref: string) {
+		selectedTabIndex = 0; // Switch to table tab
+		searchValueInTable = ref;
+	}
+
+	let selectedTabIndex: number = $state(0); // for lazy-loading the chart
+
+	let showGraph: boolean = $state(false);
+
+	$effect.pre(() => {
+		if (selectedTabIndex === 1) {
+			showGraph = true;
 		}
 	});
 </script>
@@ -50,33 +64,34 @@
 	{/if}
 	{#if bom.components}
 		<section class="tabs">
-			<Tabs type="default">
+			<Tabs type="default" bind:selected={selectedTabIndex}>
 				<Tab label="Table" />
 				<Tab label="Chart" />
 				<svelte:fragment slot="content">
 					<TabContent>
-						{#if treeData}
-							<div class="tab__tile">
-								<ComponentsTreeView
-									nodes={treeData}
-									selectedComponentRef={selectedComponentRefInTreeView}
-								/>
-							</div>
-						{/if}
+						<div class="tab__tile">
+							<ComponentsTreeView {bom} selectedComponentRef={selectedComponentRefInTreeView} />
+						</div>
 						<div class="tab__tile">
 							<ComponentsTable
 								components={bom.components}
-								searchComponent={searchComponentInTreeView}
+								{searchComponentInTreeView}
+								{searchComponentInTreeGraph}
 								showComponentDetails={showComponentModal}
+								searchValue={searchValueInTable}
 							/>
 						</div>
 					</TabContent>
 					<TabContent>
-						{#if treeData}
-							<div class="tab__tile">
-								<ComponentsTreeChart {bom} nodes={treeData} />
-							</div>
-						{/if}
+						<div class="tab__tile">
+							{#if showGraph}
+								<ComponentsTreeChart
+									{bom}
+									selectedComponentRef={selectedComponentRefInTreeGraph}
+									searchForComponent={searchForComponentInTable}
+								/>
+							{/if}
+						</div>
 					</TabContent>
 				</svelte:fragment>
 			</Tabs>
@@ -110,7 +125,7 @@
 	}
 
 	.tab__tile {
-		background-color: theme.$layer-01;
+		background-color: theme.$layer;
 		padding: layout.$spacing-05;
 	}
 

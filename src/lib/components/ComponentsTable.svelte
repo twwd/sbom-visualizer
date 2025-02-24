@@ -9,16 +9,20 @@
 	} from 'carbon-components-svelte';
 	import type { DataTableRow } from 'carbon-components-svelte/src/DataTable/DataTable.svelte';
 	import type { Component } from '$lib/cyclonedx/models';
-	import { Document, Search } from 'carbon-icons-svelte';
+	import { DecisionTree, Document, TreeView } from 'carbon-icons-svelte';
 
 	let {
 		components,
-		searchComponent,
-		showComponentDetails
+		searchComponentInTreeView,
+		searchComponentInTreeGraph,
+		showComponentDetails,
+		searchValue = ''
 	}: {
 		components: Component[];
-		searchComponent: (id: string) => void;
+		searchComponentInTreeView: (id: string) => void;
+		searchComponentInTreeGraph: (id: string) => void;
 		showComponentDetails: (component: Component) => void;
+		searchValue: string;
 	} = $props();
 
 	let rows: DataTableRow[] = $derived.by(() => {
@@ -65,25 +69,34 @@
 >
 	<Toolbar>
 		<ToolbarContent>
-			<ToolbarSearch persistent shouldFilterRows />
+			<ToolbarSearch persistent shouldFilterRows value={searchValue} />
 		</ToolbarContent>
 	</Toolbar>
 	<svelte:fragment slot="cell" let:row let:cell>
 		{#if cell.key === 'actions'}
-			<Button
-				size="small"
-				icon={Search}
-				iconDescription="Show component in dependency tree"
-				kind="ghost"
-				on:click={() => searchComponent(row.id)}
-			/>
-			<Button
-				size="small"
-				icon={Document}
-				iconDescription="Show details"
-				kind="ghost"
-				on:click={() => showComponentDetailsForRow(row)}
-			/>
+			<div class="actions">
+				<Button
+					size="small"
+					icon={TreeView}
+					iconDescription="Show component in dependency tree view"
+					kind="ghost"
+					on:click={() => searchComponentInTreeView(row.id)}
+				/>
+				<Button
+					size="small"
+					icon={DecisionTree}
+					iconDescription="Show component in dependency tree graph"
+					kind="ghost"
+					on:click={() => searchComponentInTreeGraph(row.id)}
+				/>
+				<Button
+					size="small"
+					icon={Document}
+					iconDescription="Show details"
+					kind="ghost"
+					on:click={() => showComponentDetailsForRow(row)}
+				/>
+			</div>
 		{:else}{cell.value}{/if}
 	</svelte:fragment>
 </DataTable>
@@ -99,5 +112,9 @@
 
 	p {
 		margin-bottom: layout.$spacing-04;
+	}
+
+	.actions {
+		white-space: nowrap;
 	}
 </style>

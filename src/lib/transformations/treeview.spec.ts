@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import type { Bom } from '$lib/cyclonedx/models';
-import { type TreeItem, TreeItemImpl } from '$lib/models/tree';
-import { createTreeDataFromBom } from '$lib/tree';
+import { type TreeItem, TreeItemImpl } from '$lib/models/treeview';
+import { createTreeDataFromBom } from '$lib/treeview';
 
 describe('createTreeDataFromBom', () => {
 	it('creates a tree structure from a basic BOM', () => {

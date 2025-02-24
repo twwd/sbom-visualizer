@@ -1,5 +1,5 @@
 import type { Bom } from '$lib/cyclonedx/models';
-import { type TreeItem, TreeItemImpl } from '$lib/models/tree';
+import { type TreeItem, TreeItemImpl } from '$lib/models/treeview';
 
 const PlaceholderTreeItemForCycle: TreeItem = new TreeItemImpl('[cycle]', 'cycle');
 
@@ -67,8 +67,6 @@ export function createTreeDataFromBom(bom: Bom, maxDepth: number = 4): TreeItem[
 		console.error(`No subject found in ${bom.metadata}`);
 	}
 
-	console.log(
-		`Successfully created a tree with ${nodeCount} nodes`
-	);
+	console.log(`Successfully created a tree with ${nodeCount} nodes`);
 	return data;
 }
