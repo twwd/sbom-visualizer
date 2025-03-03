@@ -9,17 +9,15 @@
 	} from 'carbon-components-svelte';
 	import type { DataTableRow } from 'carbon-components-svelte/src/DataTable/DataTable.svelte';
 	import type { Component } from '$lib/cyclonedx/models';
-	import { DecisionTree, Document, TreeView } from 'carbon-icons-svelte';
+	import { DecisionTree, Document } from 'carbon-icons-svelte';
 
 	let {
 		components,
-		searchComponentInTreeView,
 		searchComponentInTreeGraph,
 		showComponentDetails,
 		searchValue = ''
 	}: {
 		components: Component[];
-		searchComponentInTreeView: (id: string) => void;
 		searchComponentInTreeGraph: (id: string) => void;
 		showComponentDetails: (component: Component) => void;
 		searchValue: string;
@@ -75,13 +73,6 @@
 	<svelte:fragment slot="cell" let:row let:cell>
 		{#if cell.key === 'actions'}
 			<div class="actions">
-				<Button
-					size="small"
-					icon={TreeView}
-					iconDescription="Show component in dependency tree view"
-					kind="ghost"
-					on:click={() => searchComponentInTreeView(row.id)}
-				/>
 				<Button
 					size="small"
 					icon={DecisionTree}

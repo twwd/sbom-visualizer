@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Bom, Component } from '$lib/cyclonedx/models';
 	import ComponentsTable from '$lib/components/ComponentsTable.svelte';
-	import ComponentsTreeView from '$lib/components/ComponentsTreeView.svelte';
 	import { Button, Tab, TabContent, Tabs, Tile } from 'carbon-components-svelte';
 	import ComponentsTreeChart from '$lib/components/ComponentsTreeChart.svelte';
 	import ComponentModal from '$lib/components/ComponentModal.svelte';
@@ -10,13 +9,8 @@
 	let { bom = null }: { bom: Bom | null } = $props();
 
 	let selectedComponentForModal: Component | undefined = $state();
-	let selectedComponentRefInTreeView: string | undefined = $state();
 	let selectedComponentRefInTreeGraph: string | undefined = $state();
 	let searchValueInTable: string = $state('');
-
-	function searchComponentInTreeView(id: string) {
-		selectedComponentRefInTreeView = id;
-	}
 
 	function searchComponentInTreeGraph(id: string) {
 		selectedTabIndex = 1; // Switch to graph tab
@@ -70,12 +64,8 @@
 				<svelte:fragment slot="content">
 					<TabContent>
 						<div class="tab__tile">
-							<ComponentsTreeView {bom} selectedComponentRef={selectedComponentRefInTreeView} />
-						</div>
-						<div class="tab__tile">
 							<ComponentsTable
 								components={bom.components}
-								{searchComponentInTreeView}
 								{searchComponentInTreeGraph}
 								showComponentDetails={showComponentModal}
 								searchValue={searchValueInTable}
