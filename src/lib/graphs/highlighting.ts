@@ -2,6 +2,7 @@ import type { HighlightedGraphState, TreeChartState } from '$lib/models/treechar
 import { allSimplePaths } from 'graphology-simple-path';
 import { edgePathFromNodePath } from 'graphology-shortest-path';
 import type Graph from 'graphology';
+import { getGraphRootNode } from '$lib/graphs/utils';
 
 export function isInterestingNode(treeChartState: TreeChartState, node: string): boolean {
 	if (!treeChartState.hovered.targetNode && !treeChartState.selected.targetNode) {
@@ -36,7 +37,7 @@ export function getHighlightedGraphState(graph?: Graph, node?: string) {
 	if (node) {
 		graphState.targetNode = node;
 		if (graph) {
-			const root = graph.nodes()[0];
+			const root = getGraphRootNode(graph);
 			const paths = allSimplePaths(graph, root, node);
 			if (paths) {
 				graphState.highlightedNodes = paths.reduce(
