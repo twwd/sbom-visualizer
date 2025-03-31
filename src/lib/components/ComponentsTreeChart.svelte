@@ -1,53 +1,47 @@
 <script lang="ts">
 	import { getContext, onDestroy } from 'svelte';
 	import Sigma from 'sigma';
-	import type { Bom } from '$lib/cyclonedx/models';
 	import type { Coordinates, EdgeDisplayData, NodeDisplayData } from 'sigma/types';
-	import type { AbstractGraph, SerializedGraph } from 'graphology-types';
+	import type { AbstractGraph } from 'graphology-types';
 	import { borderSubtle01, borderStrong01, tagTokens, textDisabled } from '@carbon/themes';
 	import type { TreeChartState } from '$lib/models/treechart';
-	import type { PostMessage } from '$lib/models/worker';
-	import Graph from 'graphology';
 	import { SkeletonPlaceholder } from 'carbon-components-svelte';
 	import {
 		getHighlightedGraphState,
 		isInterestingEdge,
 		isInterestingNode
 	} from '$lib/graphs/highlighting';
+	import { LayoutGraphWorkerWrapper } from '$lib/worker/GraphWorkerWrapper';
+	import Graph from 'graphology';
 
 	let {
-		bom,
+		graph,
 		selectedComponentRef,
 		searchForComponent
-	}: { bom: Bom; selectedComponentRef?: string; searchForComponent: (ref?: string) => void } =
-		$props();
+	}: {
+		graph: AbstractGraph | null;
+		selectedComponentRef?: string;
+		searchForComponent?: (ref: string) => void;
+	} = $props();
 	const theme: () => string = getContext('theme');
+
+	let internalGraph: Graph | undefined = $state();
+	let lastUnprocessedGraph: Graph | undefined = $state();
 
 	let container: HTMLDivElement;
 	let renderer: Sigma | undefined;
-	let graph: AbstractGraph | undefined;
-	let isLoading: boolean = $state(true);
+
+	const treeGenerationWorkerWrapper = new LayoutGraphWorkerWrapper((g: Graph) => {
+		internalGraph = g;
+		setupGraph();
+	});
+
+	let isLoading: boolean = $derived(graph === null);
 
 	const treeChartState: TreeChartState = {
 		hovered: {},
 		selected: {}
 	};
-
-	let treeGenerationWorker: Worker | undefined = undefined;
-
-	function handleWorkerMessage({ data: { payload } }: MessageEvent<PostMessage<SerializedGraph>>) {
-		if (payload) {
-			setupGraph(new Graph().import(payload));
-		}
-	}
-
-	function setupWorker() {
-		treeGenerationWorker = new Worker(new URL('$lib/worker/tree-generation.ts', import.meta.url), {
-			type: 'module'
-		});
-
-		treeGenerationWorker.onmessage = handleWorkerMessage;
-	}
 
 	function refreshGraph() {
 		// Refresh rendering
@@ -57,35 +51,44 @@
 		});
 	}
 
-	function setupGraph(localGraph: Graph) {
-		graph = localGraph;
+	function setupGraph() {
+		if (!internalGraph) {
+			return;
+		}
 
-		// Initialize sigma to render the graph
-		renderer = new Sigma(graph, container, {
+		// Stop old renderer and reset chart state
+		if (renderer) {
+			renderer.kill();
+			treeChartState.hovered = {};
+			treeChartState.selected = {};
+		}
+		// Initialize sigma to render the internalGraph
+		renderer = new Sigma(internalGraph, container, {
 			defaultEdgeType: 'arrow',
 			defaultNodeColor: tagTokens.tagTokens.tagColorBlue[theme()],
 			defaultEdgeColor: borderSubtle01
 		});
-		isLoading = false;
 
-		// Bind graph interactions:
+		// Bind internalGraph interactions:
 		renderer?.on('enterNode', ({ node }) => {
-			treeChartState.hovered = getHighlightedGraphState(graph, node);
+			treeChartState.hovered = getHighlightedGraphState(internalGraph, node);
 			refreshGraph();
 		});
 		renderer?.on('clickNode', ({ node }) => {
-			treeChartState.selected = getHighlightedGraphState(graph, node);
+			treeChartState.selected = getHighlightedGraphState(internalGraph, node);
 			refreshGraph();
 		});
 		renderer?.on('doubleClickNode', ({ node }) => {
-			searchForComponent(node);
+			if (searchForComponent) {
+				searchForComponent(node);
+			}
 		});
 		renderer?.on('leaveNode', () => {
-			treeChartState.hovered = getHighlightedGraphState(graph);
+			treeChartState.hovered = getHighlightedGraphState(internalGraph);
 			refreshGraph();
 		});
 		renderer?.on('clickStage', () => {
-			treeChartState.selected = getHighlightedGraphState(graph);
+			treeChartState.selected = getHighlightedGraphState(internalGraph);
 			refreshGraph();
 		});
 
@@ -122,61 +125,34 @@
 	}
 
 	onDestroy(() => {
-		treeGenerationWorker?.terminate();
 		renderer?.kill();
+		treeGenerationWorkerWrapper?.terminate();
 	});
 
 	$effect(() => {
-		if (!treeGenerationWorker) {
-			setupWorker();
+		if (graph !== null && graph !== lastUnprocessedGraph) {
+			lastUnprocessedGraph = graph;
+			treeGenerationWorkerWrapper.sendMessage(graph.export());
 		}
 
-		if (bom && !graph) {
-			isLoading = true;
-			treeGenerationWorker?.postMessage({
-				payload: bom
-			});
-		}
+		if (internalGraph) {
+			if (selectedComponentRef) {
+				treeChartState.selected = getHighlightedGraphState(internalGraph, selectedComponentRef);
+				refreshGraph();
 
-		if (selectedComponentRef) {
-			treeChartState.selected = getHighlightedGraphState(graph, selectedComponentRef);
-			refreshGraph();
-
-			const nodePosition = renderer?.getNodeDisplayData(selectedComponentRef) as Coordinates;
-			renderer?.getCamera().animate(
-				{ ...nodePosition, ratio: 0.2 },
-				{
-					duration: 500
-				}
-			);
+				const nodePosition = renderer?.getNodeDisplayData(selectedComponentRef) as Coordinates;
+				renderer?.getCamera().animate(
+					{ ...nodePosition, ratio: 0.2 },
+					{
+						duration: 500
+					}
+				);
+			}
 		}
 	});
 </script>
 
-<h2>Dependency Graph</h2>
-
-<p>
-	<em>Double click a node to locate it in the dependency table.</em>
-</p>
-
 {#if isLoading}
 	<SkeletonPlaceholder style="min-height: 50rem; width: 100%;" />
 {/if}
-<div class="chart-container" bind:this={container}></div>
-
-<style lang="scss">
-	@use '@carbon/layout';
-
-	h2 {
-		margin-bottom: layout.$spacing-05;
-	}
-
-	p {
-		margin-bottom: layout.$spacing-05;
-	}
-
-	.chart-container {
-		width: 100%;
-		min-height: 50rem;
-	}
-</style>
+<div style="min-height: 50rem; width: 100%;" bind:this={container}></div>

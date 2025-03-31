@@ -2,11 +2,21 @@
 	import type { Bom, Component } from '$lib/cyclonedx/models';
 	import ComponentsTable from '$lib/components/ComponentsTable.svelte';
 	import { Button, Tab, TabContent, Tabs, Tile } from 'carbon-components-svelte';
-	import ComponentsTreeChart from '$lib/components/ComponentsTreeChart.svelte';
 	import ComponentModal from '$lib/components/ComponentModal.svelte';
 	import { Document } from 'carbon-icons-svelte';
+	import Graph from 'graphology';
+	import type { AbstractGraph } from 'graphology-types';
+	import { onDestroy } from 'svelte';
+	import { TreeGenerationWorkerWrapper } from '$lib/worker/GraphWorkerWrapper';
+	import GlobalComponentsTreeChart from '$lib/components/GlobalComponentsTreeChart.svelte';
 
 	let { bom = null }: { bom: Bom | null } = $props();
+
+	let graph: AbstractGraph | null = $state(null);
+
+	const treeGenerationWorkerWrapper = new TreeGenerationWorkerWrapper((g: Graph) => {
+		graph = g;
+	});
 
 	let selectedComponentForModal: Component | undefined = $state();
 	let selectedComponentRefInTreeGraph: string | undefined = $state();
@@ -30,7 +40,17 @@
 
 	let showGraph: boolean = $state(false);
 
-	$effect.pre(() => {
+	onDestroy(() => {
+		treeGenerationWorkerWrapper?.terminate();
+	});
+
+	$effect(() => {
+		if (bom) {
+			treeGenerationWorkerWrapper.sendMessage(bom);
+		}
+	});
+
+	$effect(() => {
 		if (selectedTabIndex === 1) {
 			showGraph = true;
 		}
@@ -75,8 +95,8 @@
 					<TabContent>
 						<div class="tab__tile">
 							{#if showGraph}
-								<ComponentsTreeChart
-									{bom}
+								<GlobalComponentsTreeChart
+									{graph}
 									selectedComponentRef={selectedComponentRefInTreeGraph}
 									searchForComponent={searchForComponentInTable}
 								/>
@@ -89,7 +109,7 @@
 	{/if}
 {/if}
 
-<ComponentModal component={selectedComponentForModal} />
+<ComponentModal component={selectedComponentForModal} {graph} />
 
 <style lang="scss">
 	@use '@carbon/layout';

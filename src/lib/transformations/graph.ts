@@ -45,9 +45,6 @@ export function createGraphFromBom(bom: Bom): Graph {
 	addNodes(graph, bom.components);
 	addEdges(graph, bom.dependencies);
 
-	// Use dagre to compute the layout
-	computeLayoutWithDagre(graph);
-
 	return graph;
 }
 
@@ -55,7 +52,7 @@ export function createGraphFromBom(bom: Bom): Graph {
  * Function to compute the layout using dagre and assign positions to graph nodes
  * @param graph - The graphology graph
  */
-function computeLayoutWithDagre(graph: Graph) {
+export function computeLayoutWithDagre(graph: Graph): Graph {
 	// Create a new directed graph for dagre
 	const g = new dagre.graphlib.Graph();
 
@@ -94,4 +91,5 @@ function computeLayoutWithDagre(graph: Graph) {
 			y: nodeData.y
 		});
 	});
+	return graph;
 }
