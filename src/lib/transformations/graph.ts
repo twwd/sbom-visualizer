@@ -32,8 +32,15 @@ function addEdges(graph: Graph, dependencies: Dependency[] | undefined): void {
 }
 
 function addRoot(graph: Graph, component: Component | undefined): void {
-	if (component) {
-		graph.addNode(component['bom-ref'], { label: component.name });
+	if (component && component['bom-ref']) {
+		const ref = component['bom-ref'];
+		if (!graph.hasNode(ref)) {
+			graph.addNode(component['bom-ref'], { label: component.name });
+		} else {
+			console.warn(
+				`Component with duplicate bom-ref ${ref} detected. This is not a valid CycloneDX BOM.`
+			);
+		}
 	}
 }
 
