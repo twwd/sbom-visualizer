@@ -26,7 +26,7 @@
 </svelte:head>
 
 <Header platformName="SBOM Visualizer">
-	<svelte:fragment slot="skip-to-content">
+	<svelte:fragment slot="skipToContent">
 		<SkipToContent />
 	</svelte:fragment>
 	<HeaderUtilities>
