@@ -26,6 +26,9 @@ importers:
       '@dagrejs/dagre':
         specifier: ^2.0.3
         version: 2.0.3
+      '@dagrejs/graphlib':
+        specifier: ^2
+        version: 2.2.4
       '@ibm/plex':
         specifier: ^6.4.1
         version: 6.4.1

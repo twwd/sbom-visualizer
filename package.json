@@ -71,6 +71,7 @@
 		"@carbon/type": "^11.53.0",
 		"@cyclonedx/cyclonedx-library": "^9.4.1",
 		"@dagrejs/dagre": "^2.0.3",
+		"@dagrejs/graphlib": "^2",
 		"@ibm/plex": "^6.4.1",
 		"carbon-components-svelte": "^0.99.3",
 		"carbon-icons-svelte": "^13.8.0",
