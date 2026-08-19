@@ -65,7 +65,7 @@
 		// Initialize sigma to render the internalGraph
 		renderer = new Sigma(internalGraph, container, {
 			defaultEdgeType: 'arrow',
-			defaultNodeColor: tagTokens.tagTokens.tagColorBlue[theme()],
+			defaultNodeColor: tagTokens.tagColorBlue[theme()],
 			defaultEdgeColor: borderSubtle01
 		});
 
@@ -105,7 +105,7 @@
 
 			if (treeChartState.selected?.targetNode === node) {
 				res.highlighted = true;
-				res.color = tagTokens.tagTokens.tagColorMagenta[theme()];
+				res.color = tagTokens.tagColorMagenta[theme()];
 			}
 
 			return res;
